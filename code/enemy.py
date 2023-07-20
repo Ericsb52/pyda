@@ -1,3 +1,4 @@
+
 from settings import *
 from support import  *
 from entity import *
@@ -31,11 +32,34 @@ class Enemy(Entity):
         self.attack_time = 0
         self.attack_cooldown = monster_info["attack_cooldown"]
 
-    def attack_cooldown_timer(self):
+
+
+    def take_damage(self,type):
+        if self.vulnerable:
+            self.dir = self.get_move_info()[1]
+            if type == "weapon":
+                self.health -= self.level.player.get_weapon_dmg()
+            else: # magic damage
+                pass
+            self.hit_time = pg.time.get_ticks()
+            self.vulnerable = False
+    def hit_reaction(self):
+        if not self.vulnerable:
+            self.dir *= -self.resistance
+
+    def cooldown_timers(self):
+        cur_time = pg.time.get_ticks()
+
         if not self.can_attack:
-            cur_time = pg.time.get_ticks()
             if cur_time - self.attack_time >= self.attack_cooldown:
                 self.can_attack = True
+
+        if not self.vulnerable:
+            if cur_time - self.hit_time >= self.hit_cooldown:
+                self.vulnerable = True
+    def check_death(self):
+        if self.health <= 0:
+            self.kill()
 
     def import_graphics(self,name):
         self.animations = {"idle":[],"move":[],"attack":[]}
@@ -43,7 +67,7 @@ class Enemy(Entity):
         for animation in self.animations.keys():
             self.animations[animation] = import_folder(main_path+animation)
 
-    def get_move_info(self,):
+    def get_move_info(self):
         enemy_vec = Vector2(self.rect.center)
         player_vec = Vector2(self.level.player.rect.center)
         distance = (player_vec - enemy_vec).magnitude()
@@ -53,7 +77,7 @@ class Enemy(Entity):
             direction = Vector2(0,0)
         return distance,direction
 
-    def get_status(self,):
+    def get_status(self):
         distance,direction = self.get_move_info()
 
         if distance <= self.attk_radius and self.can_attack:
@@ -68,7 +92,7 @@ class Enemy(Entity):
     def actions(self):
         if self.status == "attack":
             self.attack()
-            print("attack")
+
         elif self.status =="move":
             self.dir = self.get_move_info()[1]
         else:
@@ -76,6 +100,8 @@ class Enemy(Entity):
 
     def attack(self):
         self.attack_time = pg.time.get_ticks()
+        self.level.player.take_damage(self.attk_dmg)
+        # spawn particals at players location based on attack type
 
     def animate(self):
         animation = self.animations[self.status]
@@ -87,10 +113,18 @@ class Enemy(Entity):
 
         self.image = animation[int(self.frame_index)]
         self.rect = self.image.get_rect(center=self.hitBox.center)
+        if not self.vulnerable:
+            alpha = self.wave_value()
+            self.image.set_alpha(alpha)
+        else:
+            self.image.set_alpha(255)
 
     def update(self):
+
         self.animate()
-        self.attack_cooldown_timer()
+        self.cooldown_timers()
         self.get_status()
         self.actions()
+        self.hit_reaction()
         self.move(self.speed)
+        self.check_death()

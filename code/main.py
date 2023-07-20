@@ -4,7 +4,7 @@
 from settings import *
 from level import *
 
-# left off at 4:57:28 just finished seting up enemy starting on player enamy interactions
+# left off at 5:32:00 just finished enemy / player interactions starting on particle effects
 
 class Game:
 	def __init__(self):

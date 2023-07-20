@@ -3,6 +3,7 @@ import sys
 from debug import debug
 from pygame.math import Vector2
 import random
+from math import *
 
 # game setup
 WIDTH = 1280

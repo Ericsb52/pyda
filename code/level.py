@@ -37,6 +37,8 @@ class Level:
         self.all_sprites = All_sprites_Camera_Group()
         self.obstacle_sprites = pg.sprite.Group()
         self.weapon_sprites = pg.sprite.Group()
+        self.enemy_sprites = pg.sprite.Group()
+        self.destroyable_sprites = pg.sprite.Group()
 
         # create map
         self.create_map()
@@ -64,7 +66,10 @@ class Level:
                         if style == "boundary":
                             Tile((x, y), [self.obstacle_sprites],"invisable",)
                         if style == "grass":
-                            Tile((x,y),[self.all_sprites,self.obstacle_sprites],"grass",surf=random.choice(graphics["grass"])),
+                            Tile((x,y),
+                                 [self.all_sprites,self.obstacle_sprites,self.destroyable_sprites],
+                                 "grass",
+                                 surf=random.choice(graphics["grass"]))
                         if style == "object":
                             Tile((x,y),[self.all_sprites,self.obstacle_sprites],"object",surf=graphics["objects"][int(col)]),
                         if style == "entities":
@@ -80,13 +85,8 @@ class Level:
                                 elif col == "393":
                                     monster_type = "squid"
 
-                                Enemy(self,monster_type,(x,y),[self.all_sprites])
-                            # if col == "392":
-                            #     print("made a monster")
-                            #     Enemy(self,"monster",(x,y),[self.all_sprites])
-                            # if col == "391":
-                            #     print("made a monster")
-                            #     Enemy(self,"monster",(x,y),[self.all_sprites])
+                                Enemy(self,monster_type,(x,y),[self.all_sprites,self.enemy_sprites])
+
 
 
 
@@ -102,6 +102,24 @@ class Level:
 
     def level_update(self):
         self.all_sprites.update()
+
+        # player attack logic
+        # checking if player hit an enemy
+        if self.weapon_sprites:
+            for wep in self.weapon_sprites:
+                hits = pg.sprite.spritecollide(wep,self.enemy_sprites,False)
+                if hits:
+                    for hit in hits:
+                        hit.take_damage(wep.type)
+        # cheking if we hit grass or other destroyable object
+        if self.weapon_sprites:
+            for wep in self.weapon_sprites:
+                hits = pg.sprite.spritecollide(wep, self.destroyable_sprites, False)
+                if hits:
+                    for hit in hits:
+                        hit.destroy()
+
+
 
 
     def level_draw(self):

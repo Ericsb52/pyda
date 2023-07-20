@@ -13,5 +13,9 @@ class Tile(pg.sprite.Sprite):
             self.hitBox = self.rect.inflate(hibox_x_offset_grass,hibox_y_offset_grass)
         self.z = ""
 
+    def destroy(self):
+
+        self.kill()
+
 
 
