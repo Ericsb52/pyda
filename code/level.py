@@ -5,6 +5,8 @@ from tile import *
 from player import *
 from support import *
 from enemy import *
+from entity import *
+from particles import *
 
 
 class All_sprites_Camera_Group(pg.sprite.Group):
@@ -44,6 +46,9 @@ class Level:
         self.create_map()
         self.ui = UI(self)
 
+        self.animation_player = AnimationPlayer(self)
+
+
 
 
     def create_map(self):
@@ -64,14 +69,14 @@ class Level:
                         x = col_index * TILESIZE
                         y = row_index * TILESIZE
                         if style == "boundary":
-                            Tile((x, y), [self.obstacle_sprites],"invisable",)
+                            Tile(self,(x, y), [self.obstacle_sprites],"invisable",)
                         if style == "grass":
-                            Tile((x,y),
+                            Tile(self,(x,y),
                                  [self.all_sprites,self.obstacle_sprites,self.destroyable_sprites],
                                  "grass",
                                  surf=random.choice(graphics["grass"]))
                         if style == "object":
-                            Tile((x,y),[self.all_sprites,self.obstacle_sprites],"object",surf=graphics["objects"][int(col)]),
+                            Tile(self,(x,y),[self.all_sprites,self.obstacle_sprites],"object",surf=graphics["objects"][int(col)]),
                         if style == "entities":
                             if col == "394":
                                 self.player = Player((x,y), self.all_sprites, self)
@@ -111,16 +116,18 @@ class Level:
                 if hits:
                     for hit in hits:
                         hit.take_damage(wep.type)
+
         # cheking if we hit grass or other destroyable object
         if self.weapon_sprites:
             for wep in self.weapon_sprites:
                 hits = pg.sprite.spritecollide(wep, self.destroyable_sprites, False)
                 if hits:
                     for hit in hits:
+                        pos  = hit.rect.center
+                        offset = Vector2(0,75)
+                        for i in range(random.randint(3,6)):
+                            self.animation_player.create_grass_particles(pos-offset, [self.all_sprites])
                         hit.destroy()
-
-
-
 
     def level_draw(self):
         self.screen.fill("black")
@@ -130,9 +137,6 @@ class Level:
         debug(self.player.dir)
         debug(self.player.status,y = 40,x = 10)
         debug(len(self.weapon_sprites),y=75,x=10)
-
-
-
 
     def run(self):
 

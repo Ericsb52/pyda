@@ -1,8 +1,9 @@
 from settings import *
 
 class Tile(pg.sprite.Sprite):
-    def __init__(self,pos,groups,sprite_type,surf = pg.Surface((TILESIZE,TILESIZE))):
+    def __init__(self,level,pos,groups,sprite_type,surf = pg.Surface((TILESIZE,TILESIZE))):
         super(Tile, self).__init__(groups)
+        self.level = level
         self.sprite_type = sprite_type
         self.image = surf
         if sprite_type == "object":
@@ -14,6 +15,7 @@ class Tile(pg.sprite.Sprite):
         self.z = ""
 
     def destroy(self):
+
 
         self.kill()
 

@@ -40,7 +40,7 @@ class Enemy(Entity):
             if type == "weapon":
                 self.health -= self.level.player.get_weapon_dmg()
             else: # magic damage
-                pass
+                self.health -= self.level.player.get_magic_dmg()
             self.hit_time = pg.time.get_ticks()
             self.vulnerable = False
     def hit_reaction(self):
@@ -59,6 +59,7 @@ class Enemy(Entity):
                 self.vulnerable = True
     def check_death(self):
         if self.health <= 0:
+            self.level.animation_player.create_particles(self.monster_name,self.rect.center,[self.level.all_sprites])
             self.kill()
 
     def import_graphics(self,name):
@@ -100,7 +101,7 @@ class Enemy(Entity):
 
     def attack(self):
         self.attack_time = pg.time.get_ticks()
-        self.level.player.take_damage(self.attk_dmg)
+        self.level.player.take_damage(self.attk_dmg,self.attk_type)
         # spawn particals at players location based on attack type
 
     def animate(self):

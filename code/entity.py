@@ -32,6 +32,38 @@ class Weapon(pg.sprite.Sprite):
         if self.player.is_attacking == False:
             self.kill()
 
+# not sure why we need this i made tha calls to heal and flame in the player
+# may want to set this up as a object in the player that is created with the player
+# and have it store all the logic for the magic system
+# then it could be uses with a class system mage would get a magic system where a warior wouldent
+class Magic_Player():
+    def __init__(self,level):
+        self.level = level
+    def heal(self,target):
+        self.level.animation_player.create_particles("aura",target.rect.center,[self.level.all_sprites])
+        self.level.animation_player.create_particles("heal", target.rect.center+Vector2(0,-60), [self.level.all_sprites])
+
+    def flame(self,strength,owner):
+        if "right" in owner.status:
+            direction = Vector2(1, 0)
+        elif "left" in owner.status:
+            direction = Vector2(-1, 0)
+        elif "up" in owner.status:
+            direction = Vector2(0, -1)
+        elif "down" in owner.status:
+            direction = Vector2(0, 1)
+        for i in range(1,6):
+            if direction.x:# horizontal
+                offset_x = (direction.x * i)*TILESIZE
+                x = owner.rect.centerx + offset_x + random.randint(-TILESIZE//3,TILESIZE//3)
+                y = owner.rect.centery + random.randint(-TILESIZE//3,TILESIZE//3)
+                self.level.animation_player.create_particles("flames", (x,y), [self.level.all_sprites,self.level.weapon_sprites])
+            else: # vertical
+                offset_y = (direction.y * i) * TILESIZE
+                x = owner.rect.centerx + random.randint(-TILESIZE//3,TILESIZE//3)
+                y = owner.rect.centery + offset_y + random.randint(-TILESIZE//3,TILESIZE//3)
+                self.level.animation_player.create_particles("flames", (x, y), [self.level.all_sprites,self.level.weapon_sprites])
+
 
 class UI:
     def __init__(self,level):

@@ -4,7 +4,7 @@
 from settings import *
 from level import *
 
-# left off at 5:32:00 just finished enemy / player interactions starting on particle effects
+# left off at 6:26:00 just finished particle effects and casting magic
 
 class Game:
 	def __init__(self):

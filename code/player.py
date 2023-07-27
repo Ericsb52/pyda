@@ -33,7 +33,7 @@ class Player(Entity):
 
         # Stats
         # base Stats
-        self.stats = {"health":100,"energy":60,"attack":10,"magic":4,"speed":player_speed}
+        self.stats = {"health":100,"energy":60,"attack":10,"magic":10,"speed":player_speed}
         # cur stats
         self.health = self.stats["health"]
         self.energy = self.stats["energy"]
@@ -55,11 +55,12 @@ class Player(Entity):
         else:
             self.image.set_alpha(255)
 
-    def take_damage(self,ammount):
+    def take_damage(self,ammount,type):
         if self.vulnerable:
             self.health -= ammount
             self.vulnerable = False
             self.hit_time = pg.time.get_ticks()
+            self.level.animation_player.create_particles(type,self.rect.center,[self.level.all_sprites])
     def get_status(self):
         # if idle
         if self.dir.x == 0 and self.dir.y == 0:
@@ -82,6 +83,7 @@ class Player(Entity):
 
     def update(self):
         self.inputs()
+        self.energy_recovery()
         self.get_status()
         self.animate()
         self.cooldowns()
@@ -165,10 +167,69 @@ class Player(Entity):
         weapon_dmg = weapon_data[self.weapon]["damage"]
         return base_dmg+weapon_dmg
 
+    def get_magic_dmg(self):
+        base_dmg = self.stats["magic"]
+        weapon_dmg = magic_data[self.magic]["strength"]
+        return base_dmg + weapon_dmg
+
     def create_magic(self,style,strength,cost):
-        print(style)
-        print(strength)
-        print(cost)
+        if style == "heal":
+            self.heal(strength,cost)
+
+        if style == "flame":
+            self.cast_flames(strength,cost)
+
+    def energy_recovery(self):
+        if self.energy < self.stats["energy"]:
+            self.energy += regen_rate*self.stats["magic"]
+        else:
+            self.energy = self.stats["energy"]
+    def cast_flames(self,strength,cost):
+        if self.energy >= cost:
+            self.energy -= cost
+            # play flame sound
+            if "right" in self.status:
+                direction = Vector2(1, 0)
+            elif "left" in self.status:
+                direction = Vector2(-1, 0)
+            elif "up" in self.status:
+                direction = Vector2(0, -1)
+            elif "down" in self.status:
+                direction = Vector2(0, 1)
+            for i in range(1, 6):
+                if direction.x:  # horizontal
+                    offset_x = (direction.x * i) * TILESIZE
+                    x = self.rect.centerx + offset_x + random.randint(-TILESIZE // 3, TILESIZE // 3)
+                    y = self.rect.centery + random.randint(-TILESIZE // 3, TILESIZE // 3)
+                    self.level.animation_player.create_particles("flames", (x, y),
+                                                                 [self.level.all_sprites, self.level.weapon_sprites])
+                else:  # vertical
+                    offset_y = (direction.y * i) * TILESIZE
+                    x = self.rect.centerx + random.randint(-TILESIZE // 3, TILESIZE // 3)
+                    y = self.rect.centery + offset_y + random.randint(-TILESIZE // 3, TILESIZE // 3)
+                    self.level.animation_player.create_particles("flames", (x, y),
+                                                                 [self.level.all_sprites, self.level.weapon_sprites])
+
+    def heal(self,amount,cost):
+        if self.health < self.stats["health"]:
+            if self.energy >= cost:
+                self.energy -= cost
+                self.health += amount
+                self.level.animation_player.create_particles("aura", self.rect.center, [self.level.all_sprites])
+                self.level.animation_player.create_particles("heal", self.rect.center + Vector2(0, -60),
+                                                             [self.level.all_sprites])
+                # play heal sound
+                if self.health >= self.stats["health"]:
+                    self.health = self.stats["health"]
+                if self.energy < 0:
+                    self.energy = 0
+
+            else:
+                pass
+                #play error sound
+        else:
+            pass
+            # play error sound
 
     def cooldowns(self):
         cur_time = pg.time.get_ticks()

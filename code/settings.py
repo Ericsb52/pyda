@@ -39,6 +39,24 @@ layout_boundary_path = "../map/map_FloorBlocks.csv"
 layout_grass_path = "../map/map_Grass.csv"
 layout_object_path = "../map/map_LargeObjects.csv"
 layout_entity_path = "../map/map_Entities.csv"
+flames_path = "../graphics/particles/flame/frames"
+aura_path = "../graphics/particles/aura"
+heal_path = "../graphics/particles/heal/frames"
+claw_path = "../graphics/particles/claw"
+slash_path = "../graphics/particles/slash"
+sparkle_path = "../graphics/particles/sparkle"
+leaf_attack_path = "../graphics/particles/leaf_attack"
+thunder_path = "../graphics/particles/thunder"
+squid_path = "../graphics/particles/smoke_orange"
+raccoon_path = "../graphics/particles/raccoon"
+spirit_path = "../graphics/particles/nova"
+bamboo_path = "../graphics/particles/bamboo"
+leaf_path1 = "../graphics/particles/leaf1"
+leaf_path2 = "../graphics/particles/leaf2"
+leaf_path3 = "../graphics/particles/leaf3"
+leaf_path4 = "../graphics/particles/leaf4"
+leaf_path5 = "../graphics/particles/leaf5"
+leaf_path6 = "../graphics/particles/leaf6"
 
 #  UI settings
 BAR_HEIGHT = 20
@@ -57,6 +75,7 @@ animation_speed = 0.15
 animation_path = "../graphics/player"
 hibox_x_offset = -10
 hibox_y_offset = -20
+regen_rate = .01
 
 # weapon settings
 weapon_data = {
